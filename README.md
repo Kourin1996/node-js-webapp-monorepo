@@ -1,81 +1,154 @@
-# Turborepo starter
+# node-js-webapp-monorepo
 
-This is an official starter Turborepo.
+This repository showcases an example of a full-stack web application using NestJS for the backend and Next.js for the frontend, organized within a monorepo structure. The goal is to provide a seamless development experience while maintaining clear separation of concerns between the server and client-side code.
 
-## Using this example
+## Features
 
-Run the following command:
+- NestJS Backend: A robust, scalable server-side framework for building efficient and reliable server-side applications.
+- Next.js Frontend: A React-based framework for building user-friendly and performant web frontends.
+- Monorepo Structure: Utilizing Turborepo to manage both backend and frontend in a single repository, enabling shared code and easier dependency management.
+- TypeScript Support: Full TypeScript support for type-safe code across both NestJS and Next.js.
+- Containerized: Both the backend and frontend applications are fully containerized, allowing for consistent development environments and easy developing.
+- OpenAPI support: Automatically generate interactive API documentation with Swagger, integrated seamlessly within the NestJS backend.
 
-```sh
-npx create-turbo@latest
+## Prerequisites
+
+- Node.js (version 20 or later)
+- npm/yarn/pnpm
+
+## Structure
+
+- /backend: NestJS Backend Application
+- /frontend: Next.js Frontend Application
+- /docker-compose.yaml:
+
+## How to use
+
+```bash
+$ git clone https://github.com/Kourin1996/node-js-webapp-monorepo.git
+$ docker-compose up
 ```
 
-## What's inside?
+# How to setup project in your environment
 
-This Turborepo includes the following packages/apps:
+This section guides you how to setup such environment step by step.
 
-### Apps and Packages
+Initialize monorepo style project by Turborepo. Type name of root project and the directory will be created after the command.
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+```bash
+$ pnpm dlx create-turbo@latest
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-pnpm build
+? Where would you like to create your turborepo? node-js-webapp-monorepo
+? Which package manager do you want to use? pnpm workspaces
 ```
 
-### Develop
+Turborepo setup some child projects called `app` and `package`. You can remove existing projects `apps/docs` & `apps/web`
 
-To develop all apps and packages, run the following command:
+## Setup NestJS
 
-```
-cd my-turborepo
-pnpm dev
-```
+Initialize NestJS project under `apps`.
 
-### Remote Caching
-
-Turborepo can use a technique known as [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup), then enter the following commands:
-
-```
-cd my-turborepo
-npx turbo login
+```bash
+$ pnpm add @nestjs/cli -g
+$ cd apps && nest new backend
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+Create `packages/eslint-config/nest.js`.
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+```js
+// packages/eslint-config/nest.js
+const { resolve } = require("node:path");
 
+const project = resolve(process.cwd(), "tsconfig.json");
+
+/** @type {import("eslint").Linter.Config} */
+module.exports = {
+  extends: [
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended",
+    "eslint-config-turbo",
+  ],
+  plugins: ["@typescript-eslint/eslint-plugin"],
+  env: {
+    node: true,
+    jest: true,
+  },
+  rules: {
+    "@typescript-eslint/interface-name-prefix": "off",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+  },
+  settings: {
+    "import/resolver": {
+      typescript: {
+        project,
+      },
+    },
+  },
+  ignorePatterns: [".*.js", "node_modules/"],
+  overrides: [{ files: ["*.js?(x)", "*.ts?(x)"] }],
+};
 ```
-npx turbo link
+
+Modify `apps/backend/.eslintrc.js`.
+
+```js
+// apps/backend/.eslintrc.js
+
+/** @type {import("eslint").Linter.Config} */
+module.exports = {
+  root: true,
+  extends: ["@repo/eslint-config/nest.js"],
+  parser: "@typescript-eslint/parser",
+  parserOptions: {
+    project: true,
+  },
+};
 ```
 
-## Useful Links
+Create `packages/typescript-config/nestjs.json`.
 
-Learn more about the power of Turborepo:
+```json
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "NestJS",
+  "extends": "./base.json",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2021",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": false,
+    "noFallthroughCasesInSwitch": false
+  }
+}
+```
 
-- [Tasks](https://turbo.build/repo/docs/core-concepts/monorepos/running-tasks)
-- [Caching](https://turbo.build/repo/docs/core-concepts/caching)
-- [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching)
-- [Filtering](https://turbo.build/repo/docs/core-concepts/monorepos/filtering)
-- [Configuration Options](https://turbo.build/repo/docs/reference/configuration)
-- [CLI Usage](https://turbo.build/repo/docs/reference/command-line-reference)
+Modify `apps/backend/tsconfig.json`.
+
+```json
+{
+  "extends": "@repo/typescript-config/nextjs.json",
+  "compilerOptions": {
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
+  },
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
+}
+```
