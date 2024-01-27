@@ -44,7 +44,9 @@ $ pnpm dlx create-turbo@latest
 
 Turborepo setup some child projects called `app` and `package`. You can remove existing projects `apps/docs` & `apps/web`
 
-## Setup NestJS
+## Setup Backend
+
+### Initialize NestJS
 
 Initialize NestJS project under `apps`.
 
@@ -153,6 +155,92 @@ Modify `apps/backend/tsconfig.json`.
 }
 ```
 
+### Initialize Prisma
+
+```bash
+$ cd apps/backend
+$ pnpm add prisma @prisma/client
+$ pnpm dlx prisma init
+```
+
+Add `docker-compose.yaml` in project root.
+
+```yaml
+version: '3.9'
+services:
+  postgres:
+    image: postgres:16.1-alpine
+    ports:
+      - 5432:5432
+    volumes:
+      - ./persist/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=database
+      - POSTGRES_USER=test_user
+      - POSTGRES_PASSWORD=test_password
+```
+
+Run `docker-compose up -d` to start DB in project root.
+
+```bash
+$ docker-compose up -d
+
+[+] Running 2/2
+ ✔ Network node-js-webapp-monorepo_default       Created                                                                                                                                                                                                            0.1s 
+ ✔ Container node-js-webapp-monorepo-postgres-1  Started
+```
+
+Modify `apps/backend.env` and set `DATABASE_URL` using database name, username, password set in `docker-compose.yaml`.
+
+```env
+DATABASE_URL="postgresql://test_user:test_password@localhost:5432/database?schema=public"
+```
+
+Add new model in `apps/backend/prisma/schema.prisma`
+
+```prisma
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Book {
+  @@map("books")
+
+  id Int @id @default(autoincrement())
+  name String
+  UUID String @unique
+  price Int
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+}
+```
+
+Run `migrate dev` command to create migration files and `db pull` to apply migrations to DB.
+
+```bash
+$ cd apps/backend
+$ pnpm dlx prisma migrate dev --name init
+
+# apps/backend/prisma/migrations will be created
+
+$ pnpm dlx prisma db pull
+```
+
+Run `generate` command to generate client code under `apps/backend/src/generated/prisma`, which is set in schema.prisma.
+
+```bash
+$ pnpm dlx prisma generate
+```
+
 ## Setup Next.js
 
 ```bash
@@ -197,3 +285,33 @@ Modify `apps/frontend/tsconfig.json`
   "exclude": ["node_modules"]
 }
 ```
+
+## Setup Commands
+
+Add start command in `turbo.json`
+
+```json
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": ["**/.env.*local"],
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**"]
+    },
+    "lint": {
+      "dependsOn": ["^lint"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "start": {
+      "cache": false,
+      "persistent": true
+    }
+  }
+}
+```
+
+## Docker
