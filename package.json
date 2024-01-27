@@ -6,9 +6,12 @@
     "dev": "turbo dev",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "build:backend": "turbo run build --filter=backend",
-    "lint:backend": "turbo run lint --filter=backend",
-    "start:backend": "turbo run start --filter=backend"
+    "build:be": "turbo run build --filter=backend",
+    "build:fe": "turbo run build --filter=frontend",
+    "lint:be": "turbo run lint --filter=backend",
+    "lint:fe": "turbo run lint --filter=frontend",
+    "start:be": "turbo run start --filter=backend",
+    "start:fe": "turbo run start --filter=frontend"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

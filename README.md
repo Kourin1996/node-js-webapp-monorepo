@@ -152,3 +152,48 @@ Modify `apps/backend/tsconfig.json`.
   "exclude": ["node_modules"]
 }
 ```
+
+## Setup Next.js
+
+```bash
+$ cd apps && pnpm dlx create-next-app@latest
+```
+
+Rename `apps/frontend/eslintrc.json` to `apps/frontend/.eslintrc.js` and modify it.
+
+```js
+// apps/frontend/eslintrc.js
+
+/** @type {import("eslint").Linter.Config} */
+module.exports = {
+  root: true,
+  extends: ["@repo/eslint-config/next.js"],
+  parser: "@typescript-eslint/parser",
+  parserOptions: {
+    project: true,
+  },
+};
+```
+
+Modify `apps/frontend/tsconfig.json`
+
+```json
+{
+  "extends": "@repo/typescript-config/nextjs.json",
+  "compilerOptions": {
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
+  },
+  "include": [
+    "next-env.d.ts",
+    "next.config.js",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": ["node_modules"]
+}
+```
