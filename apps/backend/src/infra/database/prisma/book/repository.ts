@@ -15,7 +15,7 @@ export class PrismaBookRepository implements BookRepository {
       },
     });
 
-    return record !== null ? mapBookRecordToBookModel(record) : null;
+    return mapBookRecordToBookModel(record);
   }
 
   async create(book: Book): Promise<Book> {

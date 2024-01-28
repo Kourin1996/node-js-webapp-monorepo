@@ -9,15 +9,19 @@ type BookRecord = {
   updated_at?: Date;
 };
 
-export function mapBookRecordToBookModel(record: BookRecord): Book {
-  return Book.load({
-    id: record.id,
-    name: record.name,
-    uuid: record.uuid,
-    price: record.price,
-    created_at: record.created_at,
-    updated_at: record.updated_at,
-  });
+export function mapBookRecordToBookModel(
+  record: BookRecord | null,
+): Book | null {
+  return record !== null
+    ? Book.load({
+        id: record.id,
+        name: record.name,
+        uuid: record.uuid,
+        price: record.price,
+        created_at: record.created_at,
+        updated_at: record.updated_at,
+      })
+    : null;
 }
 
 export function mapBookModelToBookRecord(book: Book): BookRecord {

@@ -1,7 +1,7 @@
 import { Controller, Param, Get, Post, HttpCode } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { GetBookByIDInteractor } from '../../usecases/book/get-book-by-id/interactor';
-import { CreateBookInteractor } from '../../usecases/book/create-book/interactor';
+import { GetBookByIDInteractor } from '../../usecase/book/get-book-by-id/interactor';
+import { CreateBookInteractor } from '../../usecase/book/create-book/interactor';
 import { CreateBookRequest } from './requests';
 import { Body } from '@nestjs/common/decorators';
 import { BookResponse } from './responses';

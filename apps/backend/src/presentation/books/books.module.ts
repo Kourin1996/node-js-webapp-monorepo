@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common/decorators';
 import { BookController } from './books.controller';
-import { BookUsecaseModule } from '../../usecases/book/book.module';
+import { BookUsecaseModule } from '../../usecase/book/book.module';
 
 @Module({
   imports: [BookUsecaseModule],
