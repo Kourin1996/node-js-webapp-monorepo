@@ -1,5 +1,7 @@
 # node-js-webapp-monorepo
 
+(WIP)
+
 This repository showcases an example of a full-stack web application using NestJS for the backend and Next.js for the frontend, organized within a monorepo structure. The goal is to provide a seamless development experience while maintaining clear separation of concerns between the server and client-side code.
 
 ## Features
@@ -27,6 +29,7 @@ This repository showcases an example of a full-stack web application using NestJ
 ```bash
 $ git clone https://github.com/Kourin1996/node-js-webapp-monorepo.git
 $ docker-compose up
+$ cd apps/backend && pnpm dlx prisma migrate dev
 ```
 
 # How to setup project in your environment
@@ -166,7 +169,7 @@ $ pnpm dlx prisma init
 Add `docker-compose.yaml` in project root.
 
 ```yaml
-version: '3.9'
+version: "3.9"
 services:
   postgres:
     image: postgres:16.1-alpine
@@ -186,7 +189,7 @@ Run `docker-compose up -d` to start DB in project root.
 $ docker-compose up -d
 
 [+] Running 2/2
- ✔ Network node-js-webapp-monorepo_default       Created                                                                                                                                                                                                            0.1s 
+ ✔ Network node-js-webapp-monorepo_default       Created                                                                                                                                                                                                            0.1s
  ✔ Container node-js-webapp-monorepo-postgres-1  Started
 ```
 
@@ -204,7 +207,6 @@ Add new model in `apps/backend/prisma/schema.prisma`
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -230,9 +232,7 @@ Run `migrate dev` command to create migration files and `db pull` to apply migra
 $ cd apps/backend
 $ pnpm dlx prisma migrate dev --name init
 
-# apps/backend/prisma/migrations will be created
-
-$ pnpm dlx prisma db pull
+# apps/backend/prisma/migrations will be created and migrations will be applied to DB
 ```
 
 Run `generate` command to generate client code under `apps/backend/src/generated/prisma`, which is set in schema.prisma.
@@ -240,6 +240,14 @@ Run `generate` command to generate client code under `apps/backend/src/generated
 ```bash
 $ pnpm dlx prisma generate
 ```
+
+### Install dependencies
+
+```
+$ cd apps/backend && pnpm add @nestjs/swagger class-validator
+```
+
+### Create directories
 
 ## Setup Next.js
 
