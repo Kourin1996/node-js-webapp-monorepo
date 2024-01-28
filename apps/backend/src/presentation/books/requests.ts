@@ -12,6 +12,7 @@ export class CreateBookRequest {
   @Length(1, 36)
   uuid: string;
 
+  @ApiProperty()
   @IsNotEmpty()
   @IsInt()
   @Min(1)
